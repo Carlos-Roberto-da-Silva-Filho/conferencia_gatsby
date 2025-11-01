@@ -5,7 +5,7 @@ const IndexPage = () => {
   return (
     <Layout>
       <h1>Conferência Tech 2025</h1>
-      <p>Bem-vindo ao evento sobre Front-end e Back-end para E-commerce!</p>
+      <h3>Bem-vindo ao evento sobre Front-end e Back-end para E-commerce!</h3>
     </Layout>
   )
 }

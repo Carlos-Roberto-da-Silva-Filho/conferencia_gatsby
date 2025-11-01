@@ -1,0 +1,74 @@
+/* ================================
+   GRID DE PALESTRANTES
+   ================================ */
+
+.palestrantesGrid {
+  /* Define um grid responsivo: 
+     - Mínimo 280px por item
+     - Ajusta automaticamente (auto-fit) */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 2rem auto 4rem auto; /* Centraliza a grade */
+  padding: 0 1rem;
+}
+
+/* ================================
+   ITEM INDIVIDUAL (Card)
+   ================================ */
+
+.palestranteCard {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #ffffff;
+}
+
+.palestranteCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.palestranteCard h2 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.palestranteCard p {
+  font-size: 1rem;
+  text-align: center; 
+  margin-bottom: 0.5rem;
+}
+
+.palestranteLink,
+.detalhesLink {
+  text-decoration: none;
+  color: #0071eb;
+  font-weight: 600;
+}
+
+.detalhesLink {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.detalhesLink:hover {
+  text-decoration: underline;
+}
+
+/* ================================
+   RESPONSIVIDADE MÓVEL
+   ================================ */
+
+@media (max-width: 600px) {
+  .palestrantesGrid {
+    grid-template-columns: 1fr; /* Coluna única em telas pequenas */
+    gap: 15px;
+  }
+}

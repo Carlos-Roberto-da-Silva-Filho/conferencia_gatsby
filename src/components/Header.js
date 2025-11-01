@@ -22,6 +22,9 @@ const Header = () => {
           <li className={styles.navLinkItem}>
             <Link className={styles.navLinkText} to="/sobre">Sobre</Link>
           </li>
+          <li className={styles.navLinkItem}>
+            <Link className={styles.navLinkText} to="/local_evento">Local do Evento</Link>
+          </li>
         </ul>
       </nav>
     </header>
