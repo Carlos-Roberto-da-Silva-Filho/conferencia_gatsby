@@ -6,8 +6,8 @@ module.exports = {
     title: `Conferência Técnica de Desenvolvimento de Sistemas`,
     description: `Apresentação de projetos e estudos de caso em 
                       desenvolvimento WEB voltados para E-commerce.`,
-    author: `Curso Técnico de Desenvolvimento de Sistemas`,
-    siteUrl: `https://www.seusite.com`,
+    author: `Carlos Roberto da Silva Filho`,
+    siteUrl: `https://conferencia-gatsby.netlify.app/`,
   },
 
   plugins: [
@@ -26,6 +26,23 @@ module.exports = {
       options: {
         extensions: [`.mdx`, `.md`],
       },
+    },
+    // ================================
+    // SEO / METADADOS
+    // ================================
+    // 1. Plugin de Sitemap (usa o siteMetadata.siteUrl para criar o mapa do site)
+    `gatsby-plugin-sitemap`,
+    
+    // 2. Plugin de Robots.txt
+    {
+      resolve: 'gatsby-plugin-robots-txt',
+      options: {
+        host: 'https://conferencia-gatsby.netlify.app/', // O mesmo URL do siteMetadata
+        sitemap: 'https://conferencia-gatsby.netlify.app/sitemap-index.xml',
+        policy: [
+          { userAgent: '*', allow: '/' } // Permite o rastreamento completo
+        ]
+      }
     },
 
     // ================================

@@ -82,12 +82,11 @@
     text-align: justify;
     margin-bottom: 1rem;
     line-height: 1.6;
-    /* Melhora a leitura do texto justificado */
 }
 
 .mainContent ul {
-    padding-left: 20px;
     margin-bottom: 1.5rem;
+    text-align: center;
 }
 
 .mainContent ul li {
@@ -140,7 +139,7 @@
 .buttonPrimary {
     display: inline-block;
     padding: 12px 25px;
-    background-color: #007acc; /* Cor primária */
+    background-color: #007acc; 
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -154,6 +153,30 @@
 .buttonPrimary:hover {
     background-color: #005f99;
 }
+
+.heroSection {
+    text-align: center;
+    padding: 60px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.generalSection {
+    padding: 40px 0;
+}
+
+.heroDescription {
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.simpleLink {
+    color: #007acc;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 
 /* ================================
    RESPONSIVIDADE

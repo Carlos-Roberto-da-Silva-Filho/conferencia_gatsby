@@ -17,13 +17,16 @@ const Header = () => {
             <Link className={styles.navLinkText} to="/palestrantes">Palestrantes</Link>
           </li>
           <li className={styles.navLinkItem}>
+            <Link className={styles.navLinkText} to="/local_evento">Local do Evento</Link>
+          </li>
+          <li className={styles.navLinkItem}>
             <Link className={styles.navLinkText} to="/contato">Contato</Link>
           </li>
           <li className={styles.navLinkItem}>
             <Link className={styles.navLinkText} to="/sobre">Sobre</Link>
           </li>
           <li className={styles.navLinkItem}>
-            <Link className={styles.navLinkText} to="/local_evento">Local do Evento</Link>
+            <Link className={styles.navLinkText} to="/links">Mapa do Siste</Link>
           </li>
         </ul>
       </nav>

@@ -35,7 +35,7 @@ const PalestrasPage = ({ data }) => {
               
               {/* Informações Rápidas */}
               <p>
-                **Palestrante:** {palestra.frontmatter.palestrante}
+                <strong>Palestrante:</strong>  {palestra.frontmatter.palestrante}
               </p>
               <p style={{ marginTop: '0.5rem', fontSize: '0.9em' }}>
                 {palestra.frontmatter.dia} | {palestra.frontmatter.hora}

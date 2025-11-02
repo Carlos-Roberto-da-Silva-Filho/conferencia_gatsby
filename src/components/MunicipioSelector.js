@@ -1,83 +1,148 @@
-import React, { useState, useEffect } from "react"
-import * as styles from "../styles/municipioSelector.module.css"
+import React, { useState, useEffect, useCallback } from "react"
+import * as styles from "../styles/municipioSelector.module.css" 
 
-export default function MunicipioSelector() {
-  const uf = 42 // Código IBGE 
-  const [municipios, setMunicipios] = useState([])
-  const [search, setSearch] = useState("")
-  const [selecionado, setSelecionado] = useState(null)
+/**
+ * Componente para seleção de Estado e Município usando a API do IBGE.
+ * * @param {function} onSelect - Função de callback chamada ao selecionar um município.
+ * Recebe (nomeCompletoParaMapa, dadosDetalhes).
+ */
+export default function MunicipioSelector({ onSelect }) {
+    const [estados, setEstados] = useState([])
+    const [municipios, setMunicipios] = useState([])
+    const [ufSelecionada, setUfSelecionada] = useState("")
+    const [municipioSelecionadoId, setMunicipioSelecionadoId] = useState("")
+    const [carregando, setCarregando] = useState(false)
+    const [erro, setErro] = useState(null)
 
-  // Busca todos os municípios 
-  useEffect(() => {
-    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`)
-      .then(res => res.json())
-      .then(data => setMunicipios(data))
-      .catch(err => console.error("Erro ao carregar municípios:", err))
-  }, [])
+    //1) Carrega a lista de todos os estados do Brasil ao montar
+    useEffect(() => {
+        setCarregando(true)
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome`)
+            .then(res => res.json())
+            .then(data => {
+                setEstados(data)
+                setErro(null)
+            })
+            .catch(err => {
+                console.error("Erro ao carregar estados:", err)
+                setErro("Erro ao carregar estados do IBGE.")
+            })
+            .finally(() => setCarregando(false))
+    }, [])
 
-  // Filtra a lista conforme a pesquisa
-  const filteredMunicipios = municipios.filter(m =>
-    m.nome.toLowerCase().includes(search.toLowerCase())
-  )
+    // 2) Carrega os municípios quando um estado é selecionado
+    useEffect(() => {
+        if (!ufSelecionada) {
+            setMunicipios([])
+            setMunicipioSelecionadoId("")
+            return
+        }
 
-  return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>🗺️ Selecione um município</h2>
+        setCarregando(true)
+        setMunicipioSelecionadoId("")
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${ufSelecionada}/municipios`)
+            .then(res => res.json())
+            .then(data => {
+                setMunicipios(data)
+                setErro(null)
+            })
+            .catch(err => {
+                console.error(`Erro ao carregar municípios de ${ufSelecionada}:`, err)
+                setErro(`Erro ao carregar municípios do estado selecionado.`)
+            })
+            .finally(() => setCarregando(false))
+    }, [ufSelecionada])
+    
+    // 3) Dispara o callback para a página pai
+    const handleSelectChange = useCallback((municipioId) => {
+        setMunicipioSelecionadoId(municipioId);
+        
+        if (municipioId) {
+            const munObj = municipios.find(m => m.id === parseInt(municipioId));
+            const ufObj = estados.find(e => e.id === parseInt(ufSelecionada));
 
-      {/* Campo de busca */}
-      <input
-        type="text"
-        placeholder="Digite o nome do município..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className={styles.input}
-      />
+            if (munObj && ufObj) {
+                // Termo exato e oficial para busca no mapa (ex: "Rio de Janeiro, RJ, Brasil")
+                const nomeCompleto = `${munObj.nome}, ${ufObj.sigla}, Brasil`;
+                
+                // Dados detalhados para exibição
+                const dadosDetalhes = { 
+                    nome: munObj.nome, 
+                    uf: ufObj.sigla, 
+                    regiao: ufObj.regiao.nome 
+                };
 
-      {/* Select de municípios */}
-      <select
-        value={selecionado ? selecionado.id : ""}
-        onChange={e => {
-          const mun = municipios.find(m => m.id === parseInt(e.target.value))
-          setSelecionado(mun)
-        }}
-        className={styles.select}
-      >
-        <option value="">Selecione...</option>
-        {filteredMunicipios.map(m => (
-          <option key={m.id} value={m.id}>
-            {m.nome}
-          </option>
-        ))}
-      </select>
+                onSelect(nomeCompleto, dadosDetalhes);
+                return;
+            }
+        }
+        
+        // Se nada ou seleção incompleta, envia nulo
+        onSelect(null, null);
 
-      {/* Exibe informações do município */}
-      {selecionado && (
-        <div className={styles.card}>
-          <h3 className={styles.municipio}>{selecionado.nome}</h3>
+    }, [municipios, estados, ufSelecionada, onSelect]);
 
-          <ul className={styles.lista}>
-            <li><strong>UF:</strong> {selecionado.microrregiao.mesorregiao.UF.sigla}</li>
-            <li><strong>Estado:</strong> {selecionado.microrregiao.mesorregiao.UF.nome}</li>
-            <li><strong>Região:</strong> {selecionado.microrregiao.mesorregiao.UF.regiao.nome}</li>
-            <li><strong>Mesorregião:</strong> {selecionado.microrregiao.mesorregiao.nome}</li>
-            <li><strong>Microrregião:</strong> {selecionado.microrregiao.nome}</li>
-          </ul>
 
-          {/* Mapa centralizado e arredondado */}
-          <div className={styles.mapContainer}>
-            <iframe
-              title="Mapa do município"
-              className={styles.map}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-              src={`https://www.google.com/maps?q=${encodeURIComponent(
-                `${selecionado.nome}, Santa Catarina`
-              )}&output=embed`}
-            ></iframe>
-          </div>
+    const handleUfChange = (e) => {
+        setUfSelecionada(e.target.value)
+        // Disparar o onSelect(null, null) para limpar o mapa quando o estado muda
+        onSelect(null, null); 
+    }
+    
+    return (
+        <div className={styles.container}>
+
+            <p style={{ 
+                textAlign: 'center', 
+                marginBottom: '1rem', 
+                padding: '10px', 
+                backgroundColor: '#e4f6faff',
+                borderRadius: '6px',
+                borderLeft: '4px solid #288fd4ff'
+            }}>
+                O evento principal ocorre em Tijucas, Santa Catarina. 
+                Selecione o estado e o município para visualizar o local exato no mapa.
+            </p>
+            <br />
+            <h2 className={styles.title}>🗺️ Local do Evento (Seleção Oficial IBGE)</h2>
+            
+            {erro && <p style={{ color: 'red' }}>⚠️ {erro}</p>}
+            
+            <div className={styles.selectGroup}>
+                {/* 1. Seletor de Estado (UF) */}
+                <select
+                    value={ufSelecionada}
+                    onChange={handleUfChange}
+                    className={styles.select}
+                    disabled={carregando && estados.length === 0}
+                >
+                    <option value="">Selecione o Estado</option>
+                    {estados.map(estado => (
+                        <option key={estado.id} value={estado.id}>
+                            {estado.nome} ({estado.sigla})
+                        </option>
+                    ))}
+                </select>
+
+                {/* 2. Seletor de Município */}
+                <select
+                    value={municipioSelecionadoId}
+                    onChange={(e) => handleSelectChange(e.target.value)}
+                    className={styles.select}
+                    disabled={!ufSelecionada || carregando || municipios.length === 0}
+                >
+                    <option value="">
+                        {municipios.length === 0 && ufSelecionada ? "Carregando municípios..." : "Selecione o Município"}
+                    </option>
+                    {municipios.map(municipio => (
+                        <option key={municipio.id} value={municipio.id}>
+                            {municipio.nome}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {carregando && <p>Carregando dados...</p>}
         </div>
-      )}
-    </div>
-  )
+    )
 }
